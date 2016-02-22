@@ -20,6 +20,9 @@
      this.currentRoute = null;
      console.log(this);
 
+     // hakkan hoidma kõiki purke
+     this.jars = [];
+
      // Kui tahan Moosipurgile referenci siis kasutan THIS = MOOSIPURGI RAKENDUS ISE
      this.init();
    };
@@ -70,13 +73,31 @@
          this.routeChange();
        }
 
+       //saan kätte purgid localStorage kui on
+       if(localStorage.jars){
+           //võtan stringi ja teen tagasi objektideks
+           this.jars = JSON.parse(localStorage.jars);
+           console.log('laadisin localStorageist massiiivi ' + this.jars.length);
+
+           //tekitan loendi htmli
+           this.jars.forEach(function(jar){
+
+               var new_jar = new Jar(jar.title, jar.ingredients);
+
+               var li = new_jar.createHtmlElement();
+               document.querySelector('.list-of-jars').appendChild(li);
+
+           });
+
+       }
+
 
        // esimene loogika oleks see, et kuulame hiireklikki nupul
-       this.bindMouseEvents();
+       this.bindEvents();
 
      },
 
-     bindMouseEvents: function(){
+     bindEvents: function(){
        document.querySelector('.add-new-jar').addEventListener('click', this.addNewClick.bind(this));
 
      },
@@ -91,6 +112,13 @@
        //console.log(title + ' ' + ingredients);
        //1) tekitan uue Jar'i
        var new_jar = new Jar(title, ingredients);
+
+       //lisan massiiivi purgi
+       this.jars.push(new_jar);
+       console.log(JSON.stringify(this.jars));
+       // JSON'i stringina salvestan localStorage'isse
+       localStorage.setItem('jars', JSON.stringify(this.jars));
+
        // 2) lisan selle htmli listi juurde
        var li = new_jar.createHtmlElement();
        document.querySelector('.list-of-jars').appendChild(li);
